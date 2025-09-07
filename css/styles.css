@@ -394,8 +394,13 @@ body {
 
 .pix-buttons {
     display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin: 16px 0;
+}
+
+.pix-buttons .pix-pay-btn {
+    grid-column: 1 / -1;
 }
 
 .pix-pay-btn {

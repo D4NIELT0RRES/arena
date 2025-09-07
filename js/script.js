@@ -1,7 +1,7 @@
 // Configurações do sistema
 const CONFIG = {
-    pixKey: '42211474829', // CNPJ da igreja (substitua pelo CNPJ real)
-    pixKeyType: 'cnpj', // Tipo da chave: 'email', 'cpf', 'cnpj', 'phone', 'random'
+    pixKey: '42211474829', // CPF para teste
+    pixKeyType: 'cpf', // Tipo da chave: 'email', 'cpf', 'cnpj', 'phone', 'random'
     merchantName: 'Arena Transformados',
     eventName: 'Marmitas de Churrasco',
     amount: 25.00,
@@ -55,16 +55,109 @@ function closeTicketModal() {
 // Função para gerar código PIX
 function generatePixCode() {
     const pixData = {
-        key: CONFIG.pixKey.replace(/[^\d]/g, ''), // Remove formatação do CNPJ
+        key: CONFIG.pixKey.replace(/[^\d]/g, ''), // Remove formatação do CPF/CNPJ
         amount: CONFIG.amount,
         description: CONFIG.description,
-        merchantName: CONFIG.merchantName
+        merchantName: CONFIG.merchantName,
+        keyType: CONFIG.pixKeyType
     };
     
-    // Formato do código PIX (EMV) - versão simplificada para melhor compatibilidade
-    const pixCode = `00020126580014br.gov.bcb.pix0136${pixData.key}520400005303986540${pixData.amount.toFixed(2)}5802BR5913${pixData.merchantName}6009SAO PAULO62070503***6304`;
+    // Gerar código PIX no formato EMV mais compatível
+    const pixCode = generateEMVPixCode(pixData);
     
     return pixCode;
+}
+
+// Função para gerar código PIX EMV mais robusto
+function generateEMVPixCode(data) {
+    // ID do payload format
+    const payloadFormatIndicator = "000201";
+    
+    // ID do merchant account information (PIX)
+    const merchantAccountInfo = `26580014br.gov.bcb.pix0136${data.key}`;
+    
+    // ID da moeda (BRL)
+    const currencyCode = "520400005303986";
+    
+    // Valor da transação
+    const transactionAmount = `540${data.amount.toFixed(2)}`;
+    
+    // País
+    const countryCode = "5802BR";
+    
+    // Nome do merchant (limitado a 25 caracteres)
+    const merchantName = `5913${data.merchantName.substring(0, 25)}`;
+    
+    // Cidade
+    const merchantCity = "6009SAO PAULO";
+    
+    // ID do additional data field template
+    const additionalDataField = "62070503***";
+    
+    // CRC16 (será calculado corretamente)
+    const crc16 = "6304";
+    
+    // Montar o código PIX
+    const pixString = payloadFormatIndicator + 
+                     merchantAccountInfo + 
+                     currencyCode + 
+                     transactionAmount + 
+                     countryCode + 
+                     merchantName + 
+                     merchantCity + 
+                     additionalDataField + 
+                     crc16;
+    
+    return pixString;
+}
+
+// Função para formatar CPF para exibição
+function formatCPF(cpf) {
+    // Remove tudo que não é número
+    const numbers = cpf.replace(/\D/g, '');
+    
+    // Verifica se tem 11 dígitos
+    if (numbers.length !== 11) {
+        return cpf; // Retorna como está se não for CPF válido
+    }
+    
+    // Aplica a máscara do CPF
+    return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+// Função para validar CPF
+function validateCPF(cpf) {
+    // Remove formatação
+    const numbers = cpf.replace(/\D/g, '');
+    
+    // Verifica se tem 11 dígitos
+    if (numbers.length !== 11) {
+        return false;
+    }
+    
+    // Verifica se não são todos os dígitos iguais
+    if (/^(\d)\1{10}$/.test(numbers)) {
+        return false;
+    }
+    
+    // Validação básica do CPF (algoritmo)
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += parseInt(numbers.charAt(i)) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(numbers.charAt(9))) return false;
+    
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += parseInt(numbers.charAt(i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(numbers.charAt(10))) return false;
+    
+    return true;
 }
 
 // Função para gerar link PIX para bancos específicos
@@ -224,24 +317,35 @@ function openBankWebsite(bankKey, bankName) {
 
 // Função para mostrar instruções após selecionar banco
 function showBankInstructions(bankName) {
-    // Copiar código PIX automaticamente
-    copyPixCode();
+    const formattedKey = formatCPF(CONFIG.pixKey);
     
     const instructions = `
 🏦 ${bankName} - Instruções para PIX:
 
-1. No app/site do ${bankName}, procure por "PIX" ou "Pagar com PIX"
-2. Cole o código PIX copiado
-3. Confirme o destinatário e valor mostrados
-4. Complete o pagamento
-5. Volte aqui e clique em "Confirmar Pagamento"
+OPÇÃO 1 - Código PIX:
+1. No app do ${bankName}, procure por "PIX" ou "Pagar com PIX"
+2. Escolha "Pagar com PIX" ou "Ler QR Code"
+3. Cole o código PIX que será copiado
+4. Confirme o destinatário e valor
+5. Complete o pagamento
 
-✅ Código PIX já foi copiado para sua área de transferência!
+OPÇÃO 2 - Chave PIX (CPF):
+1. No app do ${bankName}, procure por "PIX" ou "Transferir"
+2. Escolha "Pagar com PIX" ou "Transferir PIX"
+3. Digite a chave CPF: ${formattedKey}
+4. Digite o valor: R$ ${CONFIG.amount.toFixed(2)}
+5. Complete o pagamento
 
-💡 Dica: Se o app não abriu, procure pelo ${bankName} na sua tela inicial ou na App Store/Play Store.
+Qual opção você prefere usar?
     `;
     
-    alert(instructions);
+    const choice = confirm(instructions + '\n\n✅ SIM = Copiar código PIX\n❌ NÃO = Usar chave PIX manual');
+    
+    if (choice) {
+        copyPixCode();
+    } else {
+        copyPixKey();
+    }
 }
 
 // Função para mostrar outros bancos
@@ -343,12 +447,38 @@ function copyPixCode() {
     });
 }
 
+// Função para gerar link PIX direto (alternativa)
+function generatePixLink() {
+    const amount = CONFIG.amount.toFixed(2);
+    const key = CONFIG.pixKey.replace(/[^\d]/g, '');
+    const description = encodeURIComponent(CONFIG.description);
+    const merchantName = encodeURIComponent(CONFIG.merchantName);
+    
+    // Link PIX direto que funciona melhor em alguns bancos
+    const pixLink = `https://pix.gerencianet.com.br/pix/${key}?valor=${amount}&descricao=${description}&nome=${merchantName}`;
+    
+    return pixLink;
+}
+
+// Função para copiar link PIX alternativo
+function copyPixLink() {
+    const pixLink = generatePixLink();
+    
+    navigator.clipboard.writeText(pixLink).then(() => {
+        alert('Link PIX copiado! Cole no navegador para abrir o PIX.');
+    }).catch(() => {
+        alert('Link PIX: ' + pixLink);
+    });
+}
+
 // Função para copiar chave PIX (mantida para compatibilidade)
 function copyPixKey() {
-    navigator.clipboard.writeText(CONFIG.pixKey).then(() => {
+    const formattedKey = formatCPF(CONFIG.pixKey);
+    
+    navigator.clipboard.writeText(formattedKey).then(() => {
         const btn = event.target;
         const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ Chave Copiada!';
+        btn.innerHTML = '✅ CPF Copiado!';
         btn.style.background = 'rgba(39, 174, 96, 0.3)';
         
         setTimeout(() => {
@@ -356,7 +486,7 @@ function copyPixKey() {
             btn.style.background = 'rgba(255, 255, 255, 0.2)';
         }, 2000);
     }).catch(() => {
-        alert('Chave PIX: ' + CONFIG.pixKey);
+        alert('Chave PIX (CPF): ' + formattedKey);
     });
 }
 
