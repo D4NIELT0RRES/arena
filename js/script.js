@@ -113,17 +113,6 @@ function closeBankSelectionModal() {
 
 // Função para selecionar banco
 function selectBank(bankKey) {
-    const banks = generatePixBankLinks();
-    const bankUrls = {
-        nubank: 'https://nubank.com.br/pix',
-        inter: 'https://bancointer.com.br/pix',
-        bradesco: 'https://banco.bradesco/html/classic/pix.shtm',
-        itau: 'https://www.itau.com.br/pix',
-        santander: 'https://www.santander.com.br/pix',
-        caixa: 'https://www.caixa.gov.br/pix',
-        bb: 'https://www.bb.com.br/pix'
-    };
-    
     const bankNames = {
         nubank: 'Nubank',
         inter: 'Banco Inter',
@@ -135,22 +124,113 @@ function selectBank(bankKey) {
     };
     
     const selectedBank = bankNames[bankKey];
-    const bankUrl = bankUrls[bankKey];
     
     // Fechar modal
     closeBankSelectionModal();
     
-    // Abrir banco
-    window.open(bankUrl, '_blank');
+    // Detectar se é mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // No mobile, tentar abrir app nativo primeiro
+        openBankApp(bankKey, selectedBank);
+    } else {
+        // No desktop, abrir site do banco
+        openBankWebsite(bankKey, selectedBank);
+    }
+}
+
+// Função para abrir app do banco no mobile
+function openBankApp(bankKey, bankName) {
+    const appUrls = {
+        nubank: 'nubank://pix',
+        inter: 'bancointer://pix',
+        bradesco: 'bradesco://pix',
+        itau: 'itau://pix',
+        santander: 'santander://pix',
+        caixa: 'caixa://pix',
+        bb: 'bb://pix'
+    };
+    
+    const webUrls = {
+        nubank: 'https://nubank.com.br/pix',
+        inter: 'https://bancointer.com.br/pix',
+        bradesco: 'https://banco.bradesco/html/classic/pix.shtm',
+        itau: 'https://www.itau.com.br/pix',
+        santander: 'https://www.santander.com.br/pix',
+        caixa: 'https://www.caixa.gov.br/pix',
+        bb: 'https://www.bb.com.br/pix'
+    };
+    
+    // Mostrar opções para o usuário
+    const options = `
+🏦 ${bankName} - Como você quer pagar?
+
+1. Abrir app do ${bankName} (se instalado)
+2. Abrir site do ${bankName} no navegador
+3. Apenas copiar dados do PIX
+
+Escolha uma opção:`;
+    
+    const choice = prompt(options);
+    
+    if (choice === '1') {
+        // Tentar abrir app nativo
+        const appUrl = appUrls[bankKey];
+        const link = document.createElement('a');
+        link.href = appUrl;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Mostrar instruções após tentar abrir o app
+        setTimeout(() => {
+            showBankInstructions(bankName);
+        }, 1000);
+        
+    } else if (choice === '2') {
+        // Abrir site do banco
+        const webUrl = webUrls[bankKey];
+        window.open(webUrl, '_blank');
+        showBankInstructions(bankName);
+        
+    } else if (choice === '3') {
+        // Apenas copiar dados
+        showBankInstructions(bankName);
+        
+    } else {
+        // Opção padrão - mostrar instruções
+        showBankInstructions(bankName);
+    }
+}
+
+// Função para abrir site do banco no desktop
+function openBankWebsite(bankKey, bankName) {
+    const webUrls = {
+        nubank: 'https://nubank.com.br/pix',
+        inter: 'https://bancointer.com.br/pix',
+        bradesco: 'https://banco.bradesco/html/classic/pix.shtm',
+        itau: 'https://www.itau.com.br/pix',
+        santander: 'https://www.santander.com.br/pix',
+        caixa: 'https://www.caixa.gov.br/pix',
+        bb: 'https://www.bb.com.br/pix'
+    };
+    
+    const webUrl = webUrls[bankKey];
+    window.open(webUrl, '_blank');
     
     // Mostrar instruções
     setTimeout(() => {
-        showBankInstructions(selectedBank);
+        showBankInstructions(bankName);
     }, 1000);
 }
 
 // Função para mostrar instruções após selecionar banco
 function showBankInstructions(bankName) {
+    // Copiar chave PIX automaticamente
+    copyPixKey();
+    
     const instructions = `
 🏦 ${bankName} - Instruções para PIX:
 
@@ -160,12 +240,12 @@ function showBankInstructions(bankName) {
 4. Complete o pagamento
 5. Volte aqui e clique em "Confirmar Pagamento"
 
-💡 Dica: A chave PIX já está copiada na sua área de transferência!
+✅ Chave PIX já foi copiada para sua área de transferência!
+
+💡 Dica: Se o app não abriu, procure pelo ${bankName} na sua tela inicial ou na App Store/Play Store.
     `;
     
-    if (confirm(instructions + '\n\nDeseja copiar a chave PIX agora?')) {
-        copyPixKey();
-    }
+    alert(instructions);
 }
 
 // Função para mostrar outros bancos

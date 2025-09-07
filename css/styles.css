@@ -815,6 +815,31 @@ body {
     font-size: 0.9rem;
 }
 
+.mobile-tips {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.mobile-tips h5 {
+    color: #856404;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.mobile-tips ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.mobile-tips li {
+    margin-bottom: 4px;
+    color: #856404;
+    font-size: 0.85rem;
+}
+
 @media (max-width: 480px) {
     .banks-grid {
         grid-template-columns: repeat(2, 1fr);
