@@ -139,12 +139,13 @@
                             </button>
                         </div>
                         
-                        <div class="pix-key-section">
-                            <div class="pix-key-label">Chave PIX (CNPJ):</div>
-                            <div class="pix-key" id="pixKey">12.345.678/0001-90</div>
-                            <button type="button" class="copy-btn" onclick="copyPixKey()">
-                                📋 Copiar Chave
+                        <div class="pix-copy-section">
+                            <button type="button" class="copy-btn" onclick="copyPixCode()">
+                                📋 Copiar Código PIX
                             </button>
+                            <div class="pix-info">
+                                <small>O código PIX contém todos os dados necessários para o pagamento</small>
+                            </div>
                         </div>
                         
                         <div style="font-size: 0.85rem; opacity: 0.9; margin-top: 12px;">
@@ -185,8 +186,8 @@
                         <span class="summary-value" id="bankSelectionAmount">R$ 25,00</span>
                     </div>
                     <div class="summary-item">
-                        <span class="summary-label">Chave PIX:</span>
-                        <span class="summary-value" id="bankSelectionPixKey">12.345.678/0001-90</span>
+                        <span class="summary-label">Status:</span>
+                        <span class="summary-value">Pronto para pagar</span>
                     </div>
                 </div>
                 
@@ -245,7 +246,8 @@
                     <ol>
                         <li>Clique no seu banco acima</li>
                         <li>Escolha como quer pagar (app ou site)</li>
-                        <li>Cole a chave PIX e digite o valor</li>
+                        <li>Cole o código PIX no app do banco</li>
+                        <li>Confirme o destinatário e valor</li>
                         <li>Complete o pagamento</li>
                         <li>Volte aqui e confirme o pagamento</li>
                     </ol>
@@ -254,7 +256,7 @@
                         <h5>📱 Dicas para Mobile:</h5>
                         <ul>
                             <li>Se o app não abrir, escolha "Abrir site"</li>
-                            <li>A chave PIX será copiada automaticamente</li>
+                            <li>O código PIX será copiado automaticamente</li>
                             <li>Você pode colar diretamente no app do banco</li>
                         </ul>
                     </div>
@@ -308,22 +310,24 @@
                             </button>
                         </div>
                         
-                        <div class="pix-key-section">
-                            <div class="pix-key-label">Chave PIX (CNPJ):</div>
-                            <div class="pix-key" id="confirmationPixKey">12.345.678/0001-90</div>
-                            <button type="button" class="copy-btn" onclick="copyPixKey()">
-                                📋 Copiar Chave
+                        <div class="pix-copy-section">
+                            <button type="button" class="copy-btn" onclick="copyPixCode()">
+                                📋 Copiar Código PIX
                             </button>
+                            <div class="pix-info">
+                                <small>O código PIX contém todos os dados necessários para o pagamento</small>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="payment-instructions">
                         <h4>📝 Instruções:</h4>
                         <ol>
-                            <li>Realize o pagamento PIX usando uma das opções acima</li>
-                            <li>Aguarde a confirmação do pagamento</li>
-                            <li>Clique em "Confirmar Pagamento" abaixo</li>
-                            <li>Receba seu comprovante digital</li>
+                            <li>Use "Pagar com PIX" para abrir seu banco</li>
+                            <li>Cole o código PIX no app do banco</li>
+                            <li>Confirme o destinatário e valor</li>
+                            <li>Complete o pagamento</li>
+                            <li>Volte aqui e clique em "Confirmar Pagamento"</li>
                         </ol>
                         
                         <div class="warning-box">

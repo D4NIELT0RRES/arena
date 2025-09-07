@@ -421,12 +421,23 @@ body {
     box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
 }
 
-.pix-key-section {
+.pix-copy-section {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     padding: 16px;
     margin: 16px 0;
     backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.pix-info {
+    margin-top: 12px;
+    opacity: 0.8;
+}
+
+.pix-info small {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .pix-key-label {

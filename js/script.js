@@ -22,9 +22,6 @@ const ORDER_TRACKING = {
 
 // Inicialização quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', function() {
-    // Atualiza a chave PIX na interface
-    document.getElementById('pixKey').textContent = CONFIG.pixKey;
-
     // Formatação automática do telefone
     document.getElementById('customerPhone').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
@@ -102,7 +99,6 @@ function showBankSelectionModal() {
     
     // Atualizar informações
     document.getElementById('bankSelectionAmount').textContent = `R$ ${CONFIG.amount.toFixed(2)}`;
-    document.getElementById('bankSelectionPixKey').textContent = CONFIG.pixKey;
 }
 
 // Função para fechar modal de seleção de bancos
@@ -228,19 +224,19 @@ function openBankWebsite(bankKey, bankName) {
 
 // Função para mostrar instruções após selecionar banco
 function showBankInstructions(bankName) {
-    // Copiar chave PIX automaticamente
-    copyPixKey();
+    // Copiar código PIX automaticamente
+    copyPixCode();
     
     const instructions = `
 🏦 ${bankName} - Instruções para PIX:
 
 1. No app/site do ${bankName}, procure por "PIX" ou "Pagar com PIX"
-2. Cole a chave PIX: ${CONFIG.pixKey}
-3. Digite o valor: R$ ${CONFIG.amount.toFixed(2)}
+2. Cole o código PIX copiado
+3. Confirme o destinatário e valor mostrados
 4. Complete o pagamento
 5. Volte aqui e clique em "Confirmar Pagamento"
 
-✅ Chave PIX já foi copiada para sua área de transferência!
+✅ Código PIX já foi copiado para sua área de transferência!
 
 💡 Dica: Se o app não abriu, procure pelo ${bankName} na sua tela inicial ou na App Store/Play Store.
     `;
