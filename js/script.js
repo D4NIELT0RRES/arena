@@ -1,6 +1,6 @@
 // Configurações do sistema
 const CONFIG = {
-    pixKey: '12.345.678/0001-90', // CNPJ da igreja (substitua pelo CNPJ real)
+    pixKey: '42211474829', // CNPJ da igreja (substitua pelo CNPJ real)
     pixKeyType: 'cnpj', // Tipo da chave: 'email', 'cpf', 'cnpj', 'phone', 'random'
     merchantName: 'Arena Transformados',
     eventName: 'Marmitas de Churrasco',
